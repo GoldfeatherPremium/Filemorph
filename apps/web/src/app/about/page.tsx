@@ -15,16 +15,16 @@ export default function AboutPage() {
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">We build tools we wanted to use.</h1>
         <div className="mt-8 space-y-6 text-lg leading-relaxed text-muted-foreground">
           <p>
-            {APP_NAME} started with a simple frustration: converting a file shouldn't require desktop software, sketchy
+            {APP_NAME} started with a simple frustration: converting a file shouldn&apos;t require desktop software, sketchy
             upload sites, or a maze of tabs. So we built one clean workspace that handles the formats people actually use —
             PDFs and images — beautifully.
           </p>
           <p>
             Our team cares about craft. That means a calm interface, honest outputs (real sizes, real percentages), and
-            privacy that's straightforward: files are stored privately and deleted automatically.
+            privacy that&apos;s straightforward: files are stored privately and deleted automatically.
           </p>
           <p>
-            We're a small, independent team. Every tool is built and tested by us — no fake conversions, no dark patterns.
+            We&apos;re a small, independent team. Every tool is built and tested by us — no fake conversions, no dark patterns.
           </p>
         </div>
         <div className="mt-10 flex gap-3">
