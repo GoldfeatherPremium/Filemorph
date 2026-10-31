@@ -35,8 +35,8 @@ export function SupportForm() {
     return (
       <Card>
         <CardContent className="p-10 text-center text-sm">
-          <p className="font-medium">Thanks — we've received your request.</p>
-          <p className="mt-1 text-muted-foreground">We'll reply to your email as soon as possible.</p>
+          <p className="font-medium">Thanks — we&apos;ve received your request.</p>
+          <p className="mt-1 text-muted-foreground">We&apos;ll reply to your email as soon as possible.</p>
         </CardContent>
       </Card>
     );
