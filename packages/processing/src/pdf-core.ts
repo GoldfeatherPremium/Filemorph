@@ -8,30 +8,41 @@ export interface RenderedPage {
   height: number;
 }
 
-type CanvasLike = { width: number; height: number; getContext: (kind: string) => unknown };
-type CanvasPair = { canvas: CanvasLike & { remove?: () => void; destroy?: () => void }; context: unknown };
+type NapiCanvas = ReturnType<typeof createCanvas>;
+type CanvasPair = { canvas: NapiCanvas; context: ReturnType<NapiCanvas["getContext"]> };
 
-const canvasFactory = {
-  create: (w: number, h: number): CanvasPair => {
-    const c = createCanvas(w, h) as CanvasLike & { remove?: () => void; destroy?: () => void };
-    // Node-canvas style hooks that pdfjs calls during cleanup.
-    c.remove = () => undefined;
-    c.destroy = () => undefined;
-    return { canvas: c, context: c.getContext("2d") };
-  },
-  reset: (pair: CanvasPair, w: number, h: number) => {
-    pair.canvas.width = w;
-    pair.canvas.height = h;
-  },
-  destroy: (pair: CanvasPair) => {
+/**
+ * CanvasFactory class consumed by pdf.js (Node path). Backed by the pure
+ * napi canvas implementation so no native `canvas` npm package is required.
+ */
+export class NapiCanvasFactory {
+  constructor(_opts?: { ownerDocument?: unknown; enableHWA?: boolean }) {}
+
+  create(width: number, height: number): CanvasPair {
+    const w = Math.max(1, Math.floor(width));
+    const h = Math.max(1, Math.floor(height));
+    const canvas = createCanvas(w, h);
+    return { canvas, context: canvas.getContext("2d") };
+  }
+
+  reset(pair: CanvasPair, width: number, height: number): void {
+    pair.canvas.width = Math.max(1, Math.floor(width));
+    pair.canvas.height = Math.max(1, Math.floor(height));
+  }
+
+  destroy(pair: CanvasPair): void {
     try {
-      pair.canvas.remove?.();
-      pair.canvas.destroy?.();
+      pair.canvas.width = 0;
+      pair.canvas.height = 0;
     } catch {
-      /* ignore cleanup errors */
+      /* ignore */
     }
-  },
-};
+    (pair as { canvas?: unknown }).canvas = null;
+    (pair as { context?: unknown }).context = null;
+  }
+}
+
+const sharedCanvasFactory = new NapiCanvasFactory();
 
 export async function openPdf(data: Buffer): Promise<Awaited<ReturnType<typeof getDocument>["promise"]>> {
   try {
@@ -40,6 +51,7 @@ export async function openPdf(data: Buffer): Promise<Awaited<ReturnType<typeof g
       useWorkerFetch: false,
       isEvalSupported: false,
       verbosity: 0,
+      CanvasFactory: NapiCanvasFactory,
     });
     return await task.promise;
   } catch (e) {
@@ -58,7 +70,11 @@ export async function renderPdfPage(
   const height = Math.max(1, Math.ceil(viewport.height));
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
-  await page.render({ canvasContext: ctx, viewport, canvasFactory }).promise;
+  await page.render({
+    canvasContext: ctx,
+    viewport,
+    canvasFactory: sharedCanvasFactory,
+  }).promise;
   const png = canvas.toBuffer("image/png");
   return { png, width, height };
 }
