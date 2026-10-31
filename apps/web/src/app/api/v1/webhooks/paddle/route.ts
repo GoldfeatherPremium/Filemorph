@@ -139,6 +139,8 @@ export async function POST(req: NextRequest) {
     event_type: event.event_type,
     payload: event.data,
     status: "received",
+    received_at: new Date().toISOString(),
+    processed_at: null,
   });
 
   if (inserted) {
