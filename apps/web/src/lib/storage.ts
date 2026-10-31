@@ -112,15 +112,6 @@ class DemoStorage implements StorageAdapter {
     return token;
   }
 
-  verifyToken(kind: "upload" | "download", storagePath: string, token: string): boolean {
-    const entry = tokens().get(token);
-    const keyEntry = tokens().get(`${kind}:${storagePath}`);
-    if (!entry || !keyEntry) return false;
-    if (entry.kind !== kind) return false;
-    if (Date.now() > entry.expiresAt) return false;
-    return true;
-  }
-
   async createSignedUploadUrl(storagePath: string): Promise<SignedUploadUrl> {
     assertSafeStoragePath(storagePath);
     const token = this.issueToken("upload", storagePath);
@@ -164,6 +155,21 @@ export function getStorage(): StorageAdapter {
   const env = serverEnv();
   cached = env.supabaseUrl && env.supabaseServiceRoleKey ? new ProdStorage() : new DemoStorage();
   return cached;
+}
+
+export function isDemoStorage(): boolean {
+  return getStorage().mode === "demo";
+}
+
+/** Verify a demo storage token (upload or download) issued by DemoStorage. */
+export function demoVerifyToken(kind: "upload" | "download", storagePath: string, token: string | null): boolean {
+  if (!token) return false;
+  const entry = tokens().get(token);
+  const keyEntry = tokens().get(`${kind}:${storagePath}`);
+  if (!entry || !keyEntry) return false;
+  if (entry.kind !== kind) return false;
+  if (Date.now() > entry.expiresAt) return false;
+  return entry.expiresAt === keyEntry.expiresAt;
 }
 
 export { DemoStorage };
