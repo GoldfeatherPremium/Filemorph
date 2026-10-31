@@ -47,7 +47,7 @@ export class JobRunner {
   async run(jobId: string): Promise<void> {
     const { data: job } = await this.sb.from("processing_jobs").select("*").eq("id", jobId).maybeSingle();
     if (!job) return;
-    const j = job as JobRow;
+    const j = job as unknown as JobRow;
     if (j.status === "cancelled") return;
     if (j.status !== "queued") return;
 
@@ -55,7 +55,7 @@ export class JobRunner {
 
     try {
       const { data: rows } = await this.sb.from("job_files").select("*").eq("job_id", jobId).eq("kind", "input").order("sequence");
-      const inputRows = (rows ?? []) as JobFileRow[];
+      const inputRows = (rows ?? []) as unknown as JobFileRow[];
       if (!inputRows.length) throw new Error("No input files on this job.");
 
       const files: ProcessInputFile[] = [];
@@ -113,11 +113,12 @@ export class JobRunner {
           .select("id")
           .single();
         if (fileErr || !fileRow) throw new Error(fileErr?.message ?? "Failed to record output file");
+        const fileId = String(fileRow.id);
 
         outputTotalBytes += o.data.length;
         jobFiles.push({
           job_id: jobId,
-          file_id: fileRow.id,
+          file_id: fileId,
           kind: "output",
           sequence: i + 1,
           label: o.name,
@@ -130,7 +131,7 @@ export class JobRunner {
           page: o.page ?? null,
         });
         outputsMeta.push({
-          fileId: fileRow.id,
+          fileId,
           fileName: o.name,
           contentType: o.contentType,
           sizeBytes: o.data.length,
