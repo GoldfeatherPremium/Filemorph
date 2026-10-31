@@ -221,8 +221,8 @@ export function AdminPanel() {
               <CardContent className="space-y-2 text-sm">
                 <LabeledInput label="Monthly price ($)" value={plan.price_monthly_usd} onChange={(v) => void savePlan(plan, { price_monthly_usd: v })} type="number" />
                 <LabeledInput label="Yearly price ($)" value={plan.price_yearly_usd} onChange={(v) => void savePlan(plan, { price_yearly_usd: v })} type="number" />
-                <LabeledInput label="Monthly quota" value={plan.monthly_job_quota ?? ""} onChange={(v) => void savePlan(plan, { monthly_job_quota: v === "" ? null : Number(v) })} type="number" />
-                <LabeledInput label="Daily quota" value={plan.daily_job_quota ?? ""} onChange={(v) => void savePlan(plan, { daily_job_quota: v === "" ? null : Number(v) })} type="number" />
+                <LabeledInput label="Monthly quota" value={plan.monthly_job_quota ?? ""} onChange={(v) => void savePlan(plan, { monthly_job_quota: v ? v : null })} type="number" />
+                <LabeledInput label="Daily quota" value={plan.daily_job_quota ?? ""} onChange={(v) => void savePlan(plan, { daily_job_quota: v ? v : null })} type="number" />
                 <LabeledInput label="Max batch size" value={plan.max_batch_size} onChange={(v) => void savePlan(plan, { max_batch_size: Number(v) })} type="number" />
                 <LabeledInput label="Max file bytes" value={plan.max_file_bytes} onChange={(v) => void savePlan(plan, { max_file_bytes: Number(v) })} type="number" />
                 <LabeledInput label="Retention (hours)" value={plan.retention_hours} onChange={(v) => void savePlan(plan, { retention_hours: Number(v) })} type="number" />
