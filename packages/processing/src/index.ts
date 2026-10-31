@@ -63,6 +63,7 @@ export async function processTool(ctx: ProcessContext): Promise<ProcessResult> {
 export * from "./types";
 export * from "./errors";
 export * from "./utils";
-export { renderPdfThumbnail, extractPdfText, openPdf } from "./pdf-core";
+export { extractPdfText, openPdf } from "./pdf-core";
+export { renderPdfThumbnail } from "./pdf-tools";
 export { buildZip, zipFromOutputs } from "./zip";
 export const PROCESSABLE_TOOLS = TOOLS.map((t) => t.code);
