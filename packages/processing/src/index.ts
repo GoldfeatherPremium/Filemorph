@@ -10,6 +10,7 @@ import {
   organizePdf,
   pdfToJpg,
   pdfToText,
+  renderPdfThumbnail,
   rotatePdf,
   splitPdf,
 } from "./pdf-tools";
