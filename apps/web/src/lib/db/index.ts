@@ -83,7 +83,10 @@ class ProdStore implements DataStore {
 
   async listUsers(q?: string) {
     let query = this.sb.from("profiles").select("*, plan:plans(*)").order("created_at", { ascending: false }).limit(200);
-    if (q) query = query.or(`email.ilike.%${q}%,full_name.ilike.%${q}%`);
+    if (q) {
+      const safe = q.replace(/[%_]/g, "");
+      query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%`);
+    }
     const { data } = await query;
     return (data ?? []) as unknown as Array<ProfileRow & { plan: PlanRow }>;
   }
@@ -168,15 +171,17 @@ class ProdStore implements DataStore {
       cancel_at_period_end: s.cancel_at_period_end ?? false,
       next_billed_at: s.next_billed_at ?? null,
     };
+    let res: { data: SubscriptionRow | null } = { data: null };
     const { data } = await this.sb
       .from("subscriptions")
       .upsert(payload, { onConflict: "provider_subscription_id" })
       .select("*")
       .maybeSingle();
+    res = { data: data as SubscriptionRow | null };
     if (s.plan_code) {
       await this.sb.from("profiles").update({ plan_code: s.plan_code }).eq("id", userId);
     }
-    return (data as SubscriptionRow | null) ?? payload as unknown as SubscriptionRow;
+    return (res.data as SubscriptionRow) ?? (payload as unknown as SubscriptionRow);
   }
 
   async insertFile(row: Partial<FileRow>) {
@@ -250,12 +255,29 @@ class ProdStore implements DataStore {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const startOfMonth = new Date(startOfDay.getFullYear(), startOfDay.getMonth(), 1);
-    let query = this.sb.from("usage_records").select("id", { count: "exact", head: true });
-    if (userId) query = query.eq("user_id", userId);
-    else query = query.eq("owner_token", ownerToken ?? "");
-    const monthly = await query.gte("created_at", startOfMonth.toISOString());
-    const daily = await query.gte("created_at", startOfDay.toISOString());
-    return { usedMonthly: monthly.count ?? 0, usedDaily: daily.count ?? 0 };
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const base = this.sb.from("usage_records").select("bytes_processed,created_at");
+    let q = base;
+    if (userId) q = q.eq("user_id", userId);
+    else q = q.eq("owner_token", ownerToken ?? "");
+    const { data } = await q;
+    const rows = data ?? [];
+    const monthStart = startOfMonth.toISOString();
+    const dayStart = startOfDay.toISOString();
+    let usedMonthly = 0;
+    let usedDaily = 0;
+    let totalBytesProcessedMonth = 0;
+    let jobsLast7Days = 0;
+    for (const r of rows) {
+      const t = r.created_at as string;
+      if (t >= monthStart) {
+        usedMonthly++;
+        totalBytesProcessedMonth += Number((r as { bytes_processed: number }).bytes_processed ?? 0);
+      }
+      if (t >= dayStart) usedDaily++;
+      if (t >= weekAgo) jobsLast7Days++;
+    }
+    return { usedMonthly, usedDaily, totalBytesProcessedMonth, jobsLast7Days };
   }
 
   async recordUsage(row: UsageRow) {
