@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { UnauthorizedError } from "@filemorph/shared";
 import { serverEnv } from "@/lib/env";
@@ -69,7 +68,7 @@ export async function getOwnerContext(): Promise<OwnerContext & { guestToken?: s
   let token = cs.get(GUEST_TOKEN_COOKIE)?.value;
   let needGuestCookie = false;
   if (!token) {
-    token = randomUUID();
+    token = crypto.randomUUID();
     needGuestCookie = true;
   }
   return { userId: null, ownerToken: token, guestToken: token, needGuestCookie };
