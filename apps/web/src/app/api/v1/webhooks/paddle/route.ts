@@ -21,6 +21,17 @@ function planFromPriceId(priceId: string | undefined): "plus" | "pro" | null {
   return map[priceId] ?? null;
 }
 
+/** Update payment event processing status (prod only; demo stays in-memory). */
+async function markEventStatus(eventId: string, status: "processed" | "failed") {
+  const store = await getDataStore();
+  if (store.mode !== "prod") return;
+  const { getSupabaseAdmin } = await import("@/lib/supabase/admin");
+  await getSupabaseAdmin()
+    .from("payment_events")
+    .update({ status, processed_at: status === "processed" ? new Date().toISOString() : null })
+    .eq("provider_event_id", eventId);
+}
+
 async function handleEvent(store: DataStore, event: Notif): Promise<void> {
   const data = event.data as {
     id?: string;
@@ -131,13 +142,12 @@ export async function POST(req: NextRequest) {
   });
 
   if (inserted) {
-    await store.updatePaymentEventStatus(event.event_id, "processing").catch(() => {});
     try {
       await handleEvent(store, event);
-      await store.updatePaymentEventStatus(event.event_id, "processed").catch(() => {});
+      await markEventStatus(event.event_id, "processed").catch(() => {});
     } catch (e) {
       logger.error("paddle.event_processing_failed", { event: event.event_type, error: e instanceof Error ? e.message : String(e) });
-      await store.updatePaymentEventStatus(event.event_id, "failed").catch(() => {});
+      await markEventStatus(event.event_id, "failed").catch(() => {});
     }
   }
 
