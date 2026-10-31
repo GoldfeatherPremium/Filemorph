@@ -29,7 +29,7 @@ export default function ContactPage() {
           </Card>
           <Card className="p-6">
             <p className="font-medium">Already have an account?</p>
-            <p className="mt-1 text-sm text-muted-foreground">Submit a ticket from your support page and we'll respond within one business day.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Submit a ticket from your support page and we&apos;ll respond within one business day.</p>
             <Button asChild className="mt-4"><Link href="/app/support">Open support</Link></Button>
           </Card>
         </div>
