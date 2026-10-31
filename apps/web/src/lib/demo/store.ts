@@ -235,8 +235,7 @@ export class DemoStore implements DataStore {
   }
 
   async listUsers(q?: string) {
-    const all = Object.values(this.state.profiles)
-      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const all = Object.values(this.state.profiles).sort((a, b) => b.created_at.localeCompare(a.created_at));
     const filtered = q
       ? all.filter((p) => p.email.includes(q.toLowerCase()) || p.full_name?.toLowerCase().includes(q.toLowerCase()))
       : all;
@@ -315,9 +314,11 @@ export class DemoStore implements DataStore {
     const existing = Object.values(this.state.subscriptions).find(
       (x) => x.user_id === userId && (!s.provider_subscription_id || x.provider_subscription_id === s.provider_subscription_id),
     );
+    let rowId = existing?.id;
     await this.mutate(() => {
       if (existing) {
         Object.assign(existing, s, { updated_at: nowIso() });
+        rowId = existing.id;
       } else {
         const row: SubscriptionRow = {
           id: uuid(),
@@ -335,6 +336,7 @@ export class DemoStore implements DataStore {
           updated_at: nowIso(),
         };
         this.state.subscriptions[row.id] = row;
+        rowId = row.id;
         if (s.plan_code) {
           const p = this.state.profiles[userId];
           if (p) {
@@ -344,7 +346,7 @@ export class DemoStore implements DataStore {
         }
       }
     });
-    const row = this.state.subscriptions[existing?.id ?? Object.keys(this.state.subscriptions).at(-1)!];
+    const row = this.state.subscriptions[rowId!];
     return structuredClone(row);
   }
 
@@ -421,6 +423,8 @@ export class DemoStore implements DataStore {
       completed_at: j.completed_at ?? null,
       cancelled_at: j.cancelled_at ?? null,
       expires_at: j.expires_at ?? null,
+      progress_pct: j.progress_pct ?? 0,
+      stage: j.stage ?? null,
       created_at: nowIso(),
       updated_at: nowIso(),
     };
@@ -500,13 +504,19 @@ export class DemoStore implements DataStore {
     const startOfMonth = new Date(startOfDay.getFullYear(), startOfDay.getMonth(), 1);
     let usedMonthly = 0;
     let usedDaily = 0;
+    let bytesMonth = 0;
+    let jobs7d = 0;
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     for (const u of this.state.usage) {
       const match = userId ? u.user_id === userId : u.owner_token === ownerToken;
       if (!match) continue;
-      if (new Date(u.created_at) >= startOfMonth) usedMonthly++;
-      if (new Date(u.created_at) >= startOfDay) usedDaily++;
+      const t = new Date(u.created_at).getTime();
+      if (t >= startOfMonth.getTime()) usedMonthly++;
+      if (t >= startOfDay.getTime()) usedDaily++;
+      if (t >= startOfMonth.getTime()) bytesMonth += Number(u.bytes_processed ?? 0);
+      if (t >= weekAgo) jobs7d++;
     }
-    return { usedMonthly, usedDaily };
+    return { usedMonthly, usedDaily, totalBytesProcessedMonth: bytesMonth, jobsLast7Days: jobs7d };
   }
 
   async recordUsage(row: UsageRow) {
