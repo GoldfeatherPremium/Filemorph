@@ -1,0 +1,38 @@
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+.next-env.d.ts
+
+# env
+.env
+.env.local
+.env*.local
+.env.production
+
+# misc
+.DS_Store
+npm-debug.log*
+*.log
+.vercel
+.vercelignore
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!vscode/settings.json
+
+# supabase local
+supabase/.temp
+
+# demo store runtime data (per-environment, contains user data)
+.demo/
+apps/web/.demo/

@@ -1,0 +1,7 @@
+node_modules
+.git
+*.md
+.DS_Store
+.env*
+apps/web
+supabase/.temp
