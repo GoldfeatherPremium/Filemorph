@@ -54,7 +54,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    // tailwindcss-animate ships as CommonJS; require() is expected here.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("tailwindcss-animate"),
+  ],
 };
 
 export default config;
