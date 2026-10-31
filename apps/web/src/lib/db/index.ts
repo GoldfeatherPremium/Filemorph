@@ -46,7 +46,7 @@ class ProdStore implements DataStore {
 
   async getUserById(id: string) {
     const { data } = await this.sb.from("profiles").select("id,email").eq("id", id).maybeSingle();
-    return data ?? null;
+    return (data as { id: string; email: string } | null) ?? null;
   }
 
   async getProfile(userId: string) {
@@ -281,7 +281,7 @@ class ProdStore implements DataStore {
   }
 
   async recordUsage(row: UsageRow) {
-    await this.sb.from("usage_records").insert(row);
+    await this.sb.from("usage_records").insert({ ...row });
   }
 
   async reserveJob(userId: string | null, ownerToken: string | null, jobId: string, toolCode: string, bytes: number): Promise<ReserveResult> {
@@ -302,14 +302,14 @@ class ProdStore implements DataStore {
   async createTicket(t: Partial<TicketRow>) {
     const { data } = await this.sb.from("support_tickets").insert(t).select("*").maybeSingle();
     if (!data) throw new Error("Failed to create ticket");
-    return data as TicketRow;
+    return data as unknown as TicketRow;
   }
 
   async listTickets(status?: string) {
     let query = this.sb.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(200);
     if (status) query = query.eq("status", status);
     const { data } = await query;
-    return (data ?? []) as TicketRow[];
+    return (data ?? []) as unknown as TicketRow[];
   }
 
   async updateTicket(id: string, status: string) {
@@ -317,14 +317,14 @@ class ProdStore implements DataStore {
   }
 
   async insertPaymentEvent(ev: PaymentEventRow): Promise<boolean> {
-    const { error } = await this.sb.from("payment_events").upsert(ev, { onConflict: "provider_event_id" });
+    const { error } = await this.sb.from("payment_events").upsert({ ...ev }, { onConflict: "provider_event_id" });
     if (error && String(error.message).includes("duplicate")) return false;
     return !error;
   }
 
   async listPaymentEvents() {
     const { data } = await this.sb.from("payment_events").select("*").order("received_at", { ascending: false }).limit(200);
-    return (data ?? []) as PaymentEventRow[];
+    return (data ?? []) as unknown as PaymentEventRow[];
   }
 
   async logAudit(a: { actorId?: string; action: string; resource?: string; resourceId?: string; ip?: string; metadata?: unknown }) {
