@@ -36,10 +36,7 @@ class ProdStorage implements StorageAdapter {
 
   async createSignedUploadUrl(storagePath: string, contentType: string, size: number): Promise<SignedUploadUrl> {
     assertSafeStoragePath(storagePath);
-    const res = await this.sb.storage.from(this.bucket).createSignedUploadUrl(storagePath, UPLOAD_URL_TTL_SECONDS, {
-      contentType,
-      cacheControl: "private, no-store",
-    });
+    const res = await this.sb.storage.from(this.bucket).createSignedUploadUrl(storagePath, UPLOAD_URL_TTL_SECONDS);
     if (res.error || !res.data) throw new Error(res.error?.message ?? "Failed to create upload URL");
     return {
       uploadUrl: res.data.signedUrl,
