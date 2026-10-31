@@ -56,6 +56,8 @@ export interface JobDTO {
   completedAt: string | null;
   cancelledAt: string | null;
   expiresAt: string | null;
+  progressPct: number;
+  stage: string | null;
   files: JobFileDTO[];
 }
 
@@ -83,6 +85,7 @@ export interface SubscriptionDTO {
 
 export interface CheckoutDTO {
   url: string;
+  configured: boolean;
 }
 
 export interface UploadUrlDTO {
