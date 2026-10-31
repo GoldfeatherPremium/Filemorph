@@ -21,6 +21,7 @@ import type {
   UsageCounts,
   UsageRow,
 } from "@/lib/db/types";
+import { demoDataDir } from "@/lib/storage";
 
 const SEED_PLANS: PlanRow[] = [
   { id: "p-free", code: "free", name: "Free", description: "For occasional transformations, at no cost.", price_monthly_usd: 0, price_yearly_usd: 0, monthly_job_quota: null, daily_job_quota: 10, max_batch_size: 1, max_file_bytes: 20 * 1024 * 1024, batch_enabled: false, advanced_compression: false, priority: 0, retention_hours: 24, sort_order: 1, is_active: true },
@@ -617,8 +618,7 @@ const g = globalThis as unknown as { __fmDemoStore?: DemoStore };
 
 export function getDemoStore(): DemoStore {
   if (!g.__fmDemoStore) {
-    const dir = process.env.DEMO_DATA_DIR || ".demo";
-    g.__fmDemoStore = new DemoStore(path.join(process.cwd(), dir, "demo-store.json"));
+    g.__fmDemoStore = new DemoStore(path.join(demoDataDir(), "demo-store.json"));
   }
   return g.__fmDemoStore;
 }
