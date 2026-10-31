@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { promises as fs } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { serverEnv } from "@/lib/env";
@@ -27,6 +28,17 @@ function assertSafeStoragePath(storagePath: string): void {
   if (normalized.startsWith("../") || normalized.includes("..") || normalized.startsWith("/")) {
     throw new Error("invalid storage path");
   }
+}
+
+/**
+ * Directory used for the local demo storage adapter. In serverless runtimes
+ * (e.g. Vercel) the project directory is read-only, so we default to the OS
+ * temp directory; DEMO_DATA_DIR may override this for local development.
+ */
+export function demoDataDir(): string {
+  const override = process.env.DEMO_DATA_DIR;
+  if (override) return path.resolve(override);
+  return path.join(os.tmpdir(), "filemorph-demo");
 }
 
 class ProdStorage implements StorageAdapter {
@@ -91,8 +103,7 @@ class DemoStorage implements StorageAdapter {
   bucket = STORAGE_BUCKET;
 
   private root(): string {
-    const dir = process.env.DEMO_DATA_DIR || ".demo";
-    return path.join(process.cwd(), dir, "storage", this.bucket);
+    return path.join(demoDataDir(), "storage", this.bucket);
   }
 
   private resolve(storagePath: string): string {
