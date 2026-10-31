@@ -15,19 +15,19 @@ export default function TermsPage() {
         <div className="mt-10 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-base font-semibold text-foreground">1. Acceptance</h2>
-            <p className="mt-2">By accessing or using {APP_NAME}, you agree to these terms. If you don't agree, don't use the service.</p>
+            <p className="mt-2">By accessing or using {APP_NAME}, you agree to these terms. If you don&apos;t agree, don&apos;t use the service.</p>
           </section>
           <section>
             <h2 className="text-base font-semibold text-foreground">2. Use of the service</h2>
-            <p className="mt-2">You may use {APP_NAME} to transform files you have the right to process. You must not upload malware, or use the service to infringe others' rights or violate law. Free and paid plans include usage limits described on the pricing page; we may enforce them automatically.</p>
+            <p className="mt-2">You may use {APP_NAME} to transform files you have the right to process. You must not upload malware, or use the service to infringe others&apos; rights or violate law. Free and paid plans include usage limits described on the pricing page; we may enforce them automatically.</p>
           </section>
           <section>
             <h2 className="text-base font-semibold text-foreground">3. Accounts & billing</h2>
-            <p className="mt-2">You're responsible for keeping your credentials safe. Paid plans renew until cancelled; Paddle processes payments. We don't guarantee that any particular transformation will produce a specific size or quality — we show real results.</p>
+            <p className="mt-2">You&apos;re responsible for keeping your credentials safe. Paid plans renew until cancelled; Paddle processes payments. We don&apos;t guarantee that any particular transformation will produce a specific size or quality — we show real results.</p>
           </section>
           <section>
             <h2 className="text-base font-semibold text-foreground">4. Limitation of liability</h2>
-            <p className="mt-2">The service is provided “as is” without warranties. To the maximum extent permitted by law, we're not liable for indirect or consequential damages. Check outputs for accuracy on material documents.</p>
+            <p className="mt-2">The service is provided “as is” without warranties. To the maximum extent permitted by law, we&apos;re not liable for indirect or consequential damages. Check outputs for accuracy on material documents.</p>
           </section>
           <section>
             <h2 className="text-base font-semibold text-foreground">5. Changes</h2>
