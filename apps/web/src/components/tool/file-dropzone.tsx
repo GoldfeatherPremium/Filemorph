@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { formatBytes } from "@/lib/utils";
 
 interface PendingFile {
