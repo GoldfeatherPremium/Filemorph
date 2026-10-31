@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { apiRoute } from "@/lib/api";
 import { getOwnerContext } from "@/lib/auth";
 import { getDataStore } from "@/lib/db";
@@ -16,5 +16,5 @@ export const GET = apiRoute(async (_req, ctx) => {
 
   const storage = getStorage();
   const url = await storage.createSignedDownloadUrl(file.storage_path);
-  redirect(url);
+  return NextResponse.redirect(url, { status: 307 });
 });
