@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 25% 97%;
+    --foreground: 218 12% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 218 12% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 12% 12%;
+    --primary: 213 34% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 12% 94%;
+    --secondary-foreground: 218 12% 16%;
+    --muted: 220 12% 94%;
+    --muted-foreground: 220 6% 47%;
+    --accent: 244 32% 91%;
+    --accent-foreground: 244 24% 26%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 12% 89%;
+    --input: 220 12% 87%;
+    --ring: 213 34% 62%;
+    --radius: 0.9rem;
+  }
+
+  .dark {
+    --background: 218 12% 8%;
+    --foreground: 40 20% 96%;
+    --card: 218 12% 11%;
+    --card-foreground: 40 20% 96%;
+    --popover: 218 12% 11%;
+    --popover-foreground: 40 20% 96%;
+    --primary: 213 38% 66%;
+    --primary-foreground: 218 12% 8%;
+    --secondary: 218 12% 16%;
+    --secondary-foreground: 40 20% 92%;
+    --muted: 218 12% 16%;
+    --muted-foreground: 220 8% 62%;
+    --accent: 244 24% 22%;
+    --accent-foreground: 244 32% 86%;
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 218 12% 18%;
+    --input: 218 12% 20%;
+    --ring: 213 38% 66%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background: rgba(125, 155, 191, 0.28);
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+  .glass-dark {
+    background: rgba(23, 25, 28, 0.72);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+  .card-surface {
+    @apply rounded-[calc(var(--radius)+6px)] border bg-card shadow-soft;
+  }
+  .hairline {
+    @apply border border-fm-line;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    animation: shimmer 1.6s infinite;
+  }
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer::after,
+    .animate-shimmer {
+      animation: none;
+    }
+  }
+}
