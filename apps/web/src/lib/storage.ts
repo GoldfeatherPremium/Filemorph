@@ -41,6 +41,20 @@ export function demoDataDir(): string {
   return path.join(os.tmpdir(), "filemorph-demo");
 }
 
+/** Strict structural check for demo object keys. */
+const SAFE_DEMO_PATH = /^(uploads|output)\/[A-Za-z0-9-]+(\/[A-Za-z0-9._-]+)*$/;
+
+export function isSafeDemoPath(storagePath: string): boolean {
+  if (!storagePath || storagePath.length > 512) return false;
+  if (!SAFE_DEMO_PATH.test(storagePath)) return false;
+  try {
+    assertSafeStoragePath(storagePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 class ProdStorage implements StorageAdapter {
   mode = "prod" as const;
   bucket = STORAGE_BUCKET;
