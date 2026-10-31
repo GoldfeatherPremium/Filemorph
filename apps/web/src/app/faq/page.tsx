@@ -23,7 +23,7 @@ export default function FaqPage() {
       <MarketingNav />
       <main className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6">
         <h1 className="text-3xl font-semibold tracking-tight">Frequently asked questions</h1>
-        <p className="mt-3 text-muted-foreground">Can't find an answer? <Link href="/contact" className="font-medium text-foreground hover:underline">Contact us</Link>.</p>
+        <p className="mt-3 text-muted-foreground">Can&apos;t find an answer? <Link href="/contact" className="font-medium text-foreground hover:underline">Contact us</Link>.</p>
         <div className="mt-10 space-y-3">
           {FAQS.map((f, i) => (
             <Card key={i} className="p-5">
