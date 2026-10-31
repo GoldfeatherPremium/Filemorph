@@ -1,5 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isAuthedByCookies, DEMO_SESSION_COOKIE, GUEST_TOKEN_COOKIE } from "@/lib/auth";
+import {
+  isAuthedByCookies,
+  DEMO_SESSION_COOKIE,
+  GUEST_TOKEN_COOKIE,
+} from "@/lib/auth-middleware";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/app"];
 const AUTH_PAGES = ["/login", "/signup"];
