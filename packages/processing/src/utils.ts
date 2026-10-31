@@ -1,6 +1,7 @@
 import path from "node:path";
 import { ProcessingError } from "./errors";
 import { TOOL_BY_CODE } from "@filemorph/shared";
+import type { ProcessContext } from "./types";
 
 /** Strip extension and dangerous chars from a client-supplied filename. */
 export function safeBaseName(filename: string): string {
