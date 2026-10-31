@@ -153,6 +153,8 @@ export interface AdminStats {
 export interface UsageCounts {
   usedMonthly: number;
   usedDaily: number;
+  totalBytesProcessedMonth: number;
+  jobsLast7Days: number;
 }
 
 export interface ReserveResult {
