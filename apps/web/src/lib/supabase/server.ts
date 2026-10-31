@@ -2,6 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { serverEnv } from "@/lib/env";
 
+interface CookieToSet {
+  name: string;
+  value: string;
+  options: Record<string, unknown>;
+}
+
 export async function createSupabaseServer() {
   const env = serverEnv();
   const cookieStore = await cookies();
@@ -10,7 +16,7 @@ export async function createSupabaseServer() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: readonly CookieToSet[]) {
         try {
           for (const { name, value, options } of cookiesToSet) {
             cookieStore.set(name, value, options);
