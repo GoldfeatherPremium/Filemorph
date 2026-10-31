@@ -33,8 +33,6 @@ export function CropStage({ src, aspect, onChange }: CropStageProps) {
   const dragRef = useRef<{ mode: "move" | "resize"; startX: number; startY: number; rect: CropRect } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const ratio = aspectValue(aspect);
-
   useEffect(() => {
     setNatural(null);
     setDisplay(null);
@@ -62,11 +60,12 @@ export function CropStage({ src, aspect, onChange }: CropStageProps) {
   }, [src]);
 
   function commitRect(next: CropRect) {
+    if (!display) return;
     const clamped = {
-      x: Math.max(0, Math.min(display!.w - next.width, next.x)),
-      y: Math.max(0, Math.min(display!.h - next.height, next.y)),
-      width: Math.max(20, Math.min(display!.w, next.width)),
-      height: Math.max(20, Math.min(display!.h, next.height)),
+      x: Math.max(0, Math.min(display.w - next.width, next.x)),
+      y: Math.max(0, Math.min(display.h - next.height, next.y)),
+      width: Math.max(20, Math.min(display.w, next.width)),
+      height: Math.max(20, Math.min(display.h, next.height)),
     };
     setRect(clamped);
     if (natural && display) {
@@ -98,20 +97,15 @@ export function CropStage({ src, aspect, onChange }: CropStageProps) {
     const ar = aspectValue(aspect);
     if (drag.mode === "move") {
       commitRect({ ...drag.rect, x: drag.rect.x + dx, y: drag.rect.y + dy });
-    } else {
-      let w = drag.rect.width + dx;
-      let h = drag.rect.height + dy;
-      if (ar) {
-        if (Math.abs(dx) > Math.abs(dy) || true) {
-          w = Math.max(20, drag.rect.width + dx);
-          h = w / ar;
-        } else {
-          h = Math.max(20, drag.rect.height + dy);
-          w = h * ar;
-        }
-      }
-      commitRect({ ...drag.rect, width: w, height: h });
+      return;
     }
+    let w = drag.rect.width + dx;
+    let h = drag.rect.height + dy;
+    if (ar) {
+      w = Math.max(20, drag.rect.width + dx);
+      h = w / ar;
+    }
+    commitRect({ ...drag.rect, width: w, height: h });
   }
 
   function onPointerUp() {
@@ -144,7 +138,7 @@ export function CropStage({ src, aspect, onChange }: CropStageProps) {
             ))}
           </div>
           <div
-            className={cn("absolute -bottom-1.5 -right-1.5 h-5 w-5 cursor-nwse-resize rounded-full bg-white border-2 border-fm-accent", )}
+            className={cn("absolute -bottom-1.5 -right-1.5 h-5 w-5 cursor-nwse-resize rounded-full bg-white border-2 border-fm-accent")}
             onPointerDown={onPointerDown("resize")}
           />
         </div>
