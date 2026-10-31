@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <AuthShell>
-      <LoginForm />
+      <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
+        <LoginForm />
+      </Suspense>
       <div className="mt-6 text-center text-sm text-muted-foreground">
         New to FileMorph?{" "}
         <Link href="/signup" className="font-medium text-foreground hover:underline">
