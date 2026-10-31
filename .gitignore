@@ -32,3 +32,7 @@ npm-debug.log*
 
 # supabase local
 supabase/.temp
+
+# demo store runtime data (per-environment, contains user data)
+.demo/
+apps/web/.demo/
