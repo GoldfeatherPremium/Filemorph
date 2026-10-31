@@ -46,8 +46,6 @@ export class NapiCanvasFactory {
   }
 }
 
-const sharedCanvasFactory = new NapiCanvasFactory();
-
 export async function openPdf(data: Buffer): Promise<Awaited<ReturnType<typeof getDocument>["promise"]>> {
   try {
     const task = getDocument({
@@ -77,7 +75,6 @@ export async function renderPdfPage(
   await page.render({
     canvasContext: ctx,
     viewport,
-    canvasFactory: sharedCanvasFactory,
   }).promise;
   const png = (canvas as unknown as { toBuffer: (fmt: string) => Buffer }).toBuffer("image/png");
   return { png, width, height };
