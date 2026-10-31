@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <div className="mt-10 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-base font-semibold text-foreground">1. What we collect</h2>
-            <p className="mt-2">When you create an account we store your email, an optional display name, and your preferences. When you upload files, we store the file bytes in private object storage for the duration of your plan's retention window.</p>
+            <p className="mt-2">When you create an account we store your email, an optional display name, and your preferences. When you upload files, we store the file bytes in private object storage for the duration of your plan&apos;s retention window.</p>
           </section>
           <section>
             <h2 className="text-base font-semibold text-foreground">2. How files are handled</h2>
