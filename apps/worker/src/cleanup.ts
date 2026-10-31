@@ -22,10 +22,14 @@ export function startCleanup(env: WorkerEnv, log: (msg: string) => void): NodeJS
         .eq("status", "expired")
         .limit(500);
       for (const f of expired ?? []) {
-        if (f.storage_path) {
-          await sb.storage.from(bucket).remove([f.storage_path]).catch(() => {});
+        try {
+          if (f.storage_path) {
+            await sb.storage.from(bucket).remove([f.storage_path]);
+          }
+          await sb.from("files").delete().eq("id", f.id);
+        } catch {
+          /* ignore per-object errors */
         }
-        await sb.from("files").delete().eq("id", f.id).catch(() => {});
       }
       log(`cleanup run: ${(expired ?? []).length} expired files removed`);
     } catch (e) {
@@ -33,7 +37,6 @@ export function startCleanup(env: WorkerEnv, log: (msg: string) => void): NodeJS
     }
   }
 
-  // initial run shortly after boot
   const first = setTimeout(() => void run(), 10_000);
   const interval = setInterval(() => void run(), env.cleanupIntervalMs);
   first.unref?.();
