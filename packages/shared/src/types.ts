@@ -39,6 +39,16 @@ export interface JobFileDTO {
   createdAt: string;
 }
 
+export interface JobOutputMeta {
+  fileId?: string | null;
+  fileName?: string;
+  contentType?: string;
+  sizeBytes?: number;
+  width?: number | null;
+  height?: number | null;
+  page?: number | null;
+}
+
 export interface JobDTO {
   id: string;
   toolCode: string;
@@ -46,7 +56,7 @@ export interface JobDTO {
   inputTotalBytes: number;
   outputTotalBytes: number;
   settings: Record<string, unknown>;
-  result: { outputs: Array<{ storagePath: string; filename: string; contentType: string; sizeBytes: number; width?: number | null; height?: number | null; page?: number | null }> } | null;
+  result: { outputs: JobOutputMeta[] } | null;
   errorCode: string | null;
   errorMessage: string | null;
   attempts: number;
