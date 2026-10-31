@@ -25,7 +25,7 @@ export function apiRoute<C = RouteContext>(handler: Handler<C>) {
 }
 
 /** Parse a JSON request body against a Zod schema (throws BadRequestError). */
-export async function parseBody<T>(req: Request, schema: z.ZodType<T>): Promise<T> {
+export async function parseBody<T>(req: Request, schema: z.ZodType<T, any, any>): Promise<T> {
   let raw: unknown;
   try {
     raw = await req.json();
