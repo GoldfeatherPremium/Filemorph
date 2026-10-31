@@ -16,7 +16,8 @@ describe("validation", () => {
   it("rejects wrong file types", async () => {
     const png = await makePng();
     expect(() => assertAcceptedMime("merge-pdf", png, "image/png")).toThrow(ProcessingError);
-    expect(() => assertAcceptedMime("image-compressor", await makeJpeg(), "image/jpeg")).not.toThrow();
+    const jpeg = await makeJpeg();
+    expect(() => assertAcceptedMime("image-compressor", jpeg, "image/jpeg")).not.toThrow();
     expect(() => assertAcceptedMime("png-to-jpg", png, "image/png")).not.toThrow();
   });
 
