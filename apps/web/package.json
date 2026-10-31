@@ -27,7 +27,7 @@
     "@radix-ui/react-tabs": "^1.1.6",
     "@radix-ui/react-tooltip": "^1.1.10",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.1",
+    "@supabase/supabase-js": "2.49.1",
     "bullmq": "^5.48.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
