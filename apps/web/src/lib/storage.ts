@@ -34,9 +34,9 @@ class ProdStorage implements StorageAdapter {
   bucket = STORAGE_BUCKET;
   private sb = getSupabaseAdmin();
 
-  async createSignedUploadUrl(storagePath: string, contentType: string, size: number): Promise<SignedUploadUrl> {
+  async createSignedUploadUrl(storagePath: string, _contentType: string, _size: number): Promise<SignedUploadUrl> {
     assertSafeStoragePath(storagePath);
-    const res = await this.sb.storage.from(this.bucket).createSignedUploadUrl(storagePath, UPLOAD_URL_TTL_SECONDS);
+    const res = await this.sb.storage.from(this.bucket).createSignedUploadUrl(storagePath, { upsert: true });
     if (res.error || !res.data) throw new Error(res.error?.message ?? "Failed to create upload URL");
     return {
       uploadUrl: res.data.signedUrl,
