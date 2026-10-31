@@ -8,37 +8,41 @@ export interface RenderedPage {
   height: number;
 }
 
+type AnyCanvas = { canvas: unknown; context: unknown };
 type NapiCanvas = ReturnType<typeof createCanvas>;
-type CanvasPair = { canvas: NapiCanvas; context: ReturnType<NapiCanvas["getContext"]> };
 
 /**
  * CanvasFactory class consumed by pdf.js (Node path). Backed by the pure
  * napi canvas implementation so no native `canvas` npm package is required.
+ * Types are intentionally loose — pdf.js's DOM-oriented typings don't match
+ * the napi canvas surface.
  */
 export class NapiCanvasFactory {
   constructor(_opts?: { ownerDocument?: unknown; enableHWA?: boolean }) {}
 
-  create(width: number, height: number): CanvasPair {
+  create(width: number, height: number): AnyCanvas {
     const w = Math.max(1, Math.floor(width));
     const h = Math.max(1, Math.floor(height));
-    const canvas = createCanvas(w, h);
+    const canvas = createCanvas(w, h) as unknown as NapiCanvas;
     return { canvas, context: canvas.getContext("2d") };
   }
 
-  reset(pair: CanvasPair, width: number, height: number): void {
-    pair.canvas.width = Math.max(1, Math.floor(width));
-    pair.canvas.height = Math.max(1, Math.floor(height));
+  reset(pair: AnyCanvas, width: number, height: number): void {
+    const canvas = pair.canvas as NapiCanvas;
+    canvas.width = Math.max(1, Math.floor(width));
+    canvas.height = Math.max(1, Math.floor(height));
   }
 
-  destroy(pair: CanvasPair): void {
+  destroy(pair: AnyCanvas): void {
     try {
-      pair.canvas.width = 0;
-      pair.canvas.height = 0;
+      const canvas = pair.canvas as NapiCanvas;
+      canvas.width = 0;
+      canvas.height = 0;
     } catch {
       /* ignore */
     }
-    (pair as { canvas?: unknown }).canvas = null;
-    (pair as { context?: unknown }).context = null;
+    pair.canvas = null;
+    pair.context = null;
   }
 }
 
@@ -68,14 +72,14 @@ export async function renderPdfPage(
   const viewport = page.getViewport({ scale });
   const width = Math.max(1, Math.ceil(viewport.width));
   const height = Math.max(1, Math.ceil(viewport.height));
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext("2d");
+  const canvas = createCanvas(width, height) as unknown as NapiCanvas;
+  const ctx = canvas.getContext("2d") as unknown as CanvasRenderingContext2D;
   await page.render({
     canvasContext: ctx,
     viewport,
     canvasFactory: sharedCanvasFactory,
   }).promise;
-  const png = canvas.toBuffer("image/png");
+  const png = (canvas as unknown as { toBuffer: (fmt: string) => Buffer }).toBuffer("image/png");
   return { png, width, height };
 }
 
