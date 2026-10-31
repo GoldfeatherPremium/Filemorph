@@ -8,14 +8,28 @@ export interface RenderedPage {
   height: number;
 }
 
+type CanvasLike = { width: number; height: number; getContext: (kind: string) => unknown };
+type CanvasPair = { canvas: CanvasLike & { remove?: () => void; destroy?: () => void }; context: unknown };
+
 const canvasFactory = {
-  create: (w: number, h: number) => {
-    const c = createCanvas(w, h);
+  create: (w: number, h: number): CanvasPair => {
+    const c = createCanvas(w, h) as CanvasLike & { remove?: () => void; destroy?: () => void };
+    // Node-canvas style hooks that pdfjs calls during cleanup.
+    c.remove = () => undefined;
+    c.destroy = () => undefined;
     return { canvas: c, context: c.getContext("2d") };
   },
-  reset: (c: { canvas: { width: number; height: number } }, w: number, h: number) => {
-    c.canvas.width = w;
-    c.canvas.height = h;
+  reset: (pair: CanvasPair, w: number, h: number) => {
+    pair.canvas.width = w;
+    pair.canvas.height = h;
+  },
+  destroy: (pair: CanvasPair) => {
+    try {
+      pair.canvas.remove?.();
+      pair.canvas.destroy?.();
+    } catch {
+      /* ignore cleanup errors */
+    }
   },
 };
 
