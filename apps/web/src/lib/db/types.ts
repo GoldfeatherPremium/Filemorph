@@ -69,6 +69,8 @@ export interface JobRow {
   completed_at: string | null;
   cancelled_at: string | null;
   expires_at: string | null;
+  progress_pct: number;
+  stage: string | null;
   created_at: string;
   updated_at: string;
 }
