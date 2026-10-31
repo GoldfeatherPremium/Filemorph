@@ -25,7 +25,7 @@ export async function makePdf(
   for (const p of pages) {
     const page = doc.addPage([400, 300]);
     if (p.image) {
-      const img = await doc.embedJpeg(p.image);
+      const img = await doc.embedJpg(p.image);
       page.drawImage(img, { x: 20, y: 40, width: 360, height: 220 });
     }
     page.drawText(p.text ?? "Page", { x: 40, y: 260, size: 20, font });
