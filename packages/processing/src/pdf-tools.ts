@@ -80,7 +80,7 @@ export async function compressPdf(ctx: ProcessContext): Promise<ProcessOutputFil
   for (let i = 1; i <= pdf.numPages; i++) {
     const rendered = await renderPdfPage(pdf, i, preset.scale);
     const jpeg = await sharp(rendered.png).jpeg({ quality: preset.quality, mozjpeg: true }).toBuffer();
-    const img = await out.embedJpeg(jpeg);
+    const img = await out.embedJpg(jpeg);
     const page = out.addPage([rendered.width / preset.scale, rendered.height / preset.scale]);
     page.drawImage(img, {
       x: 0,
@@ -180,7 +180,7 @@ export async function jpgToPdf(ctx: ProcessContext): Promise<ProcessOutputFile[]
     const drawH = h * scale;
     const x = (pageW - drawW) / 2;
     const y = (pageH - drawH) / 2;
-    const imgObj = await out.embedJpeg(jpeg);
+    const imgObj = await out.embedJpg(jpeg);
     page.drawImage(imgObj, { x, y, width: drawW, height: drawH });
     ctx.onProgress?.(Math.round(((i + 1) / ctx.files.length) * 100), "Building PDF");
   }
