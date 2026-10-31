@@ -1,12 +1,12 @@
 import Link from "next/link";
 import * as Icons from "lucide-react";
 import type { ToolDef } from "@filemorph/shared";
-import { Card } from "@//components/ui/card";
+import { Card } from "@/components/ui/card";
 
 const IconMap = Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>;
 
 function Icon({ name }: { name: string }) {
-  const Cmp = (Map[name] ?? (Icons.File as unknown as React.ComponentType<{ className?: string }>);
+  const Cmp = IconMap[name] ?? (Icons.File as unknown as React.ComponentType<{ className?: string }>);
   return <Cmp className="h-5 w-5" />;
 }
 
