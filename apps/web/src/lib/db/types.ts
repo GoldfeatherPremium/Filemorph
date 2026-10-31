@@ -1,4 +1,4 @@
-import type { PlanRow } from "@filemorph/shared";
+import type { PlanRow, JobOutputMeta } from "@filemorph/shared";
 
 export interface ProfileRow {
   id: string;
@@ -60,7 +60,7 @@ export interface JobRow {
   input_total_bytes: number;
   output_total_bytes: number;
   settings: Record<string, unknown>;
-  result: { outputs: Array<Record<string, unknown>> } | null;
+  result: { outputs: JobOutputMeta[] } | null;
   error_code: string | null;
   error_message: string | null;
   attempts: number;
