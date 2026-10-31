@@ -344,14 +344,16 @@ const g = globalThis as unknown as { __fmDataStore?: DataStore };
 export async function getDataStore(): Promise<DataStore> {
   if (g.__fmDataStore) return g.__fmDataStore;
   const env = serverEnv();
+  let store: DataStore;
   if (env.supabaseUrl && env.supabaseServiceRoleKey) {
-    g.__fmDataStore = new ProdStore();
+    store = new ProdStore();
   } else {
     const demo = getDemoStore();
     await demo.init();
-    g.__fmDataStore = demo;
+    store = demo;
   }
-  return g.__fmDataStore;
+  g.__fmDataStore = store;
+  return store;
 }
 
 export type { DataStore, AdminStats, ProfileRow, PlanRow, FileRow, JobRow, JobFileRow, SubscriptionRow, UsageCounts, TicketRow, PreferencesRow };
