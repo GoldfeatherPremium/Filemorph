@@ -46,7 +46,7 @@ class ProdStore implements DataStore {
 
   async getUserById(id: string) {
     const { data } = await this.sb.from("profiles").select("id,email").eq("id", id).maybeSingle();
-    return (data as { id: string; email: string } | null) ?? null;
+    return (data as unknown as { id: string; email: string } | null) ?? null;
   }
 
   async getProfile(userId: string) {
@@ -61,7 +61,7 @@ class ProdStore implements DataStore {
 
   async getProfileByEmail(email: string) {
     const { data } = await this.sb.from("profiles").select("*").eq("email", email.toLowerCase()).maybeSingle();
-    return (data as ProfileRow | null) ?? null;
+    return (data as unknown as ProfileRow | null) ?? null;
   }
 
   async updateProfile(userId: string, patch: { fullName?: string; avatarUrl?: string | null }) {
@@ -69,7 +69,7 @@ class ProdStore implements DataStore {
     if (patch.fullName !== undefined) updates.full_name = patch.fullName || null;
     if (patch.avatarUrl !== undefined) updates.avatar_url = patch.avatarUrl || null;
     const { data } = await this.sb.from("profiles").update(updates).eq("id", userId).select("*").maybeSingle();
-    return (data as ProfileRow | null) ?? null;
+    return (data as unknown as ProfileRow | null) ?? null;
   }
 
   async isAdmin(userId: string) {
@@ -78,7 +78,7 @@ class ProdStore implements DataStore {
   }
 
   async suspendUser(userId: string, suspended: boolean, reason?: string) {
-    await this.sb.from("profiles").update({ suspended, suspension_reason: suspended ? reason ?? null : null }).eq("id", userId);
+    await this.sb.from("profiles").update({ suspended, suspension_reason: suspended ? (reason ?? null) : null }).eq("id", userId);
   }
 
   async listUsers(q?: string) {
@@ -129,33 +129,33 @@ class ProdStore implements DataStore {
 
   async getPlan(code: string) {
     const { data } = await this.sb.from("plans").select("*").eq("code", code).maybeSingle();
-    return (data as PlanRow | null) ?? null;
+    return (data as unknown as PlanRow | null) ?? null;
   }
 
   async listPlans() {
     const { data } = await this.sb.from("plans").select("*").order("sort_order").limit(10);
-    return (data ?? []) as PlanRow[];
+    return (data ?? []) as unknown as PlanRow[];
   }
 
   async updatePlan(planId: string, patch: PlanPatch) {
     const { data } = await this.sb.from("plans").update(patch).eq("id", planId).select("*").maybeSingle();
     if (!data) throw new Error("Plan not found");
-    return data as PlanRow;
+    return data as unknown as PlanRow;
   }
 
   async getPreferences(userId: string) {
     const { data } = await this.sb.from("user_preferences").select("*").eq("user_id", userId).maybeSingle();
-    return (data as PreferencesRow | null) ?? null;
+    return (data as unknown as PreferencesRow | null) ?? null;
   }
 
   async updatePreferences(userId: string, patch: Partial<PreferencesRow>) {
     const { data } = await this.sb.from("user_preferences").update(patch).eq("user_id", userId).select("*").maybeSingle();
-    return (data as PreferencesRow | null) ?? null;
+    return (data as unknown as PreferencesRow | null) ?? null;
   }
 
   async getSubscription(userId: string) {
     const { data } = await this.sb.from("subscriptions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle();
-    return (data as SubscriptionRow | null) ?? null;
+    return (data as unknown as SubscriptionRow | null) ?? null;
   }
 
   async upsertSubscription(userId: string, s: Partial<SubscriptionRow>) {
@@ -171,33 +171,32 @@ class ProdStore implements DataStore {
       cancel_at_period_end: s.cancel_at_period_end ?? false,
       next_billed_at: s.next_billed_at ?? null,
     };
-    let res: { data: SubscriptionRow | null } = { data: null };
     const { data } = await this.sb
       .from("subscriptions")
       .upsert(payload, { onConflict: "provider_subscription_id" })
       .select("*")
       .maybeSingle();
-    res = { data: data as SubscriptionRow | null };
+    const row = (data as unknown as SubscriptionRow | null) ?? (payload as unknown as SubscriptionRow);
     if (s.plan_code) {
       await this.sb.from("profiles").update({ plan_code: s.plan_code }).eq("id", userId);
     }
-    return (res.data as SubscriptionRow) ?? (payload as unknown as SubscriptionRow);
+    return row;
   }
 
   async insertFile(row: Partial<FileRow>) {
     const { data } = await this.sb.from("files").insert(row).select("*").maybeSingle();
     if (!data) throw new Error("Failed to create file record");
-    return data as FileRow;
+    return data as unknown as FileRow;
   }
 
   async getFile(id: string) {
     const { data } = await this.sb.from("files").select("*").eq("id", id).maybeSingle();
-    return (data as FileRow | null) ?? null;
+    return (data as unknown as FileRow | null) ?? null;
   }
 
   async getFileByStoragePath(p: string) {
     const { data } = await this.sb.from("files").select("*").eq("storage_path", p).maybeSingle();
-    return (data as FileRow | null) ?? null;
+    return (data as unknown as FileRow | null) ?? null;
   }
 
   async listFiles(userId?: string | null, ownerToken?: string | null) {
@@ -205,7 +204,7 @@ class ProdStore implements DataStore {
     if (userId) query = query.eq("user_id", userId);
     else query = query.eq("owner_token", ownerToken ?? "");
     const { data } = await query;
-    return (data ?? []) as FileRow[];
+    return (data ?? []) as unknown as FileRow[];
   }
 
   async deleteFile(id: string) {
@@ -215,12 +214,12 @@ class ProdStore implements DataStore {
   async createJob(j: Partial<JobRow>) {
     const { data } = await this.sb.from("processing_jobs").insert(j).select("*").maybeSingle();
     if (!data) throw new Error("Failed to create job");
-    return data as JobRow;
+    return data as unknown as JobRow;
   }
 
   async getJob(id: string) {
     const { data } = await this.sb.from("processing_jobs").select("*").eq("id", id).maybeSingle();
-    return (data as JobRow | null) ?? null;
+    return (data as unknown as JobRow | null) ?? null;
   }
 
   async listJobs(userId?: string | null, ownerToken?: string | null, opts?: { status?: string; limit?: number }) {
@@ -230,12 +229,12 @@ class ProdStore implements DataStore {
     if (opts?.status) query = query.eq("status", opts.status);
     if (opts?.limit) query = query.limit(opts.limit);
     const { data } = await query;
-    return (data ?? []) as JobRow[];
+    return (data ?? []) as unknown as JobRow[];
   }
 
   async updateJob(id: string, patch: Partial<JobRow>) {
     const { data } = await this.sb.from("processing_jobs").update(patch).eq("id", id).select("*").maybeSingle();
-    return (data as JobRow | null) ?? null;
+    return (data as unknown as JobRow | null) ?? null;
   }
 
   async deleteJob(id: string) {
@@ -248,7 +247,7 @@ class ProdStore implements DataStore {
 
   async listJobFiles(jobId: string) {
     const { data } = await this.sb.from("job_files").select("*").eq("job_id", jobId).order("sequence").limit(200);
-    return (data ?? []) as JobFileRow[];
+    return (data ?? []) as unknown as JobFileRow[];
   }
 
   async usageCounts(userId?: string | null, ownerToken?: string | null): Promise<UsageCounts> {
