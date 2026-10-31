@@ -66,6 +66,8 @@ export function toJobDTO(j: JobRow, files: JobFileRow[]): JobDTO {
     completedAt: j.completed_at,
     cancelledAt: j.cancelled_at,
     expiresAt: j.expires_at,
+    progressPct: j.progress_pct ?? 0,
+    stage: j.stage,
     files: files.map(toJobFileDTO),
   };
 }
