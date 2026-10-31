@@ -9,8 +9,13 @@ export interface UploadedFile {
   size: number;
 }
 
+interface UploadUrlResponse {
+  uploadUrl: string;
+  path: string;
+}
+
 export async function uploadFile(file: File): Promise<string> {
-  const { uploadUrl } = await apiFetch<{ uploadUrl: string }>("/api/v1/files/upload-url", {
+  const { uploadUrl, path } = await apiFetch<UploadUrlResponse>("/api/v1/files/upload-url", {
     method: "POST",
     body: JSON.stringify({
       filename: file.name,
@@ -31,7 +36,7 @@ export async function uploadFile(file: File): Promise<string> {
   const data = await apiFetch<{ id: string }>("/api/v1/files/complete", {
     method: "POST",
     body: JSON.stringify({
-      path: new URL(uploadUrl).searchParams.get("p") ?? "",
+      path,
       filename: file.name,
       contentType: file.type || "application/octet-stream",
       size: file.size,
